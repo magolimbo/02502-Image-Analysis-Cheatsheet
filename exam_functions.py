@@ -9,13 +9,13 @@ from skimage.transform import SimilarityTransform
 from skimage.transform import warp
 
 #show two images side by side
-def show_comparison(original, transformed, transformed_name):
-    fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(8, 4), sharex=True,
+def show_comparison(original, transformed, transformed_name = "Transformed Image", cmap = "gray"):
+    _, (ax1, ax2) = plt.subplots(ncols=2, figsize=(8, 4), sharex=True,
                                    sharey=True)
     ax1.imshow(original)
     ax1.set_title('Original')
     ax1.axis('off')
-    ax2.imshow(transformed)
+    ax2.imshow(transformed, cmap = cmap)
     ax2.set_title(transformed_name)
     ax2.axis('off')
     io.show()
@@ -241,12 +241,24 @@ def create_affine_matrix(transformations):
 
 
 
-def hough_to_xy(x,y):
-    # Mapping
-    # Given xy-coordinates
+def convert_hough_to_xy(x, y):
+    """
+    Convert xy-coordinates to Hough space parameters (rho and theta).
 
+    Parameters:
+    x (float): x-coordinate in Cartesian space.
+    y (float): y-coordinate in Cartesian space.
+
+    Returns:
+    None: Prints the calculated Hough space parameters.
+
+    This function maps xy-coordinates (x and y) to Hough space parameters (rho and theta).
+    It calculates rho (the distance from the origin to the closest point on the line) using the distance formula,
+    and theta (the angle between the x-axis and the normal line from the origin to the line) using the arctan2 function.
+    Then, it displays the calculated Hough space parameters.
+    """
     # Convert x and y to Hough space parameters (rho and theta)
-    rho = np.sqrt(x * 2 + y * 2)  # Calculate rho using the distance formula
+    rho = np.sqrt(x**2 + y**2)  # Calculate rho using the distance formula
     theta = np.arctan2(y, x)  # Calculate theta using the arctan2 function
 
     # Convert theta from radians to degrees for display (optional)
@@ -257,24 +269,83 @@ def hough_to_xy(x,y):
     print(f"Rho: {rho:.2f}")
     print(f"Theta (degrees): {theta_degrees:.2f}")
     
-def xy_to_hough(rho, theta_degrees,x_values=[]):
-    # Mapping from Hough Space to Cartesian Space
-    # Given Hough space parameters
+def convert_xy_to_hough(rho, theta_degrees, x_values=[]):
+    """
+    Convert Hough space parameters (rho and theta) to Cartesian space (x and y).
 
+    Parameters:
+    rho (float): The distance from the origin to the closest point on the line.
+    theta_degrees (float): The angle (in degrees) between the x-axis and the normal line from the origin to the line.
+    x_values (list): List of x values for which corresponding y values will be calculated. Default is an empty list.
+
+    Returns:
+    None: Prints the approximate data points in the xy-plane.
+    
+    """
     # Convert theta from degrees to radians
     theta_rad = theta_degrees * (np.pi / 180)
-
 
     # Function to calculate y for a given x
     def calculate_y(x):
         return (rho - x * np.cos(theta_rad)) / np.sin(theta_rad)
 
     # Calculate y for a range of x values
-    x_values = [7, 9, 6, 6, 3]  # Choose different x values
     corresponding_y_values = [calculate_y(x) for x in x_values]
 
     # Display the approximate data points
     print("Approximate data points in the xy-plane:")
     for i, x in enumerate(x_values):
         y = corresponding_y_values[i]
-        print(f"({x}, {y:.2f})")
+        print(f"({x}, {y:.2f})")
+        
+def haar_features(grey_box=[], white_box=[]):
+    """
+    Calculate Haar-like features based on the sums of pixel values in specified boxes.
+
+    Parameters:
+    grey_box (list): List of pixel values in the grey box region. Default is an empty list.
+    white_box (list): List of pixel values in the white box region. Default is an empty list.
+
+    Returns:
+    None: Prints the calculated Haar feature value.
+    
+    """
+    grey_sum = sum(grey_box)
+    white_sum = sum(white_box)
+    
+    print(f"HAAR FEATURE = {grey_sum - white_sum}\n")
+
+
+def integral_image(integral_value=[]):
+    """
+    Calculate the integral image value by summing up the given integral values.
+
+    Parameters:
+    integral_value (list): List of integral values for computation. Default is an empty list.
+
+    Returns:
+    None: Prints the calculated integral image value.
+    
+    """
+    print(f"INTEGRAL IMAGE = {sum(integral_value)}")
+
+def linear_gray_scale_transformation(image, min_val, max_val):
+    """
+    Performs a linear grayscale transformation on the input image
+    so that the transformed image has a minimum pixel value of 0.1
+    and a maximum pixel value of 0.6.
+
+    Parameters:
+    image (numpy.ndarray): Input grayscale image.
+
+    Returns:
+    numpy.ndarray: Transformed grayscale image.
+    """
+    current_min = np.min(image)
+    current_max = np.max(image)
+
+    # Perform linear transformation to the desired range [min_val, max_val]
+    transformed_image = min_val + (image - current_min) * ((max_val - min_val) / (current_max - current_min))
+    transformed_image = np.clip(transformed_image, min_val, max_val)  # Clip values to desired range
+    
+    return transformed_image

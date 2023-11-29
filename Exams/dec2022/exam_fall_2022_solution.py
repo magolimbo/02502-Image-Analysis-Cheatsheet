@@ -125,7 +125,7 @@ def we_cu_change_detection():
 
 # E2022
 def linear_stretch_and_otsus():
-    name_1 = 'data\PixelWiseOps\pixelwise.png'
+    name_1 = 'Exams\dec2022\data\PixelWiseOps\pixelwise.png'
 
     im_1 = io.imread(name_1)
     im_1_g = color.rgb2gray(im_1)
@@ -204,7 +204,7 @@ def gaussian_filtering():
 
 # E2022
 def edge_filtering():
-    in_dir = "data/Filtering/"
+    in_dir = "Exams/dec2022/data/Filtering/"
     im_name = "rocket.png"
     im_org = io.imread(in_dir + im_name)
     # io.imshow(im_org)
@@ -214,14 +214,14 @@ def edge_filtering():
     edge_img = prewitt(img_as_ubyte(im_org))
     min_val = edge_img.min()
     max_val = edge_img.max()
-    io.imshow(edge_img, vmin=min_val, vmax=max_val, cmap="terrain")
-    plt.title('Prewitt filtered image')
-    io.show()
+    # io.imshow(edge_img, vmin=min_val, vmax=max_val, cmap="terrain")
+    # plt.title('Prewitt filtered image')
+    # io.show()
 
     bin_edges = edge_img > 0.06
     io.imshow(bin_edges)
-    plt.title('Binary edges. Manual threshold')
-    io.show()
+    # plt.title('Binary edges. Manual threshold')
+    # io.show()
 
     num_pixels = bin_edges.sum()
     print(f"Number of edge pixels {num_pixels}")
@@ -506,11 +506,11 @@ def lda_classification():
 
 if __name__ == '__main__':
     # abdominal_analysis()
-    hough_space()
+    # hough_space()
     # shortest_path_cost()
     # haar_feature()
     # linear_stretch_and_otsus()
-    # edge_filtering()
+    edge_filtering()
     # lda_classification()
     # cow_sheep_classifier()
     # blob_analysis_mini_figures()
