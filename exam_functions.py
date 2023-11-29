@@ -126,8 +126,6 @@ def preprocess_one_cat():
     plt.show()
     
 
-import numpy as np
-
 
 def create_affine_matrix(transformations):
     """
@@ -240,3 +238,43 @@ def create_affine_matrix(transformations):
 # affine_matrix = create_affine_matrix(transformations)
 # # Stampare la matrice risultante
 # print(affine_matrix)
+
+
+
+def hough_to_xy(x,y):
+    # Mapping
+    # Given xy-coordinates
+
+    # Convert x and y to Hough space parameters (rho and theta)
+    rho = np.sqrt(x * 2 + y * 2)  # Calculate rho using the distance formula
+    theta = np.arctan2(y, x)  # Calculate theta using the arctan2 function
+
+    # Convert theta from radians to degrees for display (optional)
+    theta_degrees = theta * (180 / np.pi)
+
+    # Display the Hough space parameters
+    print("Hough space parameters:")
+    print(f"Rho: {rho:.2f}")
+    print(f"Theta (degrees): {theta_degrees:.2f}")
+    
+def xy_to_hough(rho, theta_degrees,x_values=[]):
+    # Mapping from Hough Space to Cartesian Space
+    # Given Hough space parameters
+
+    # Convert theta from degrees to radians
+    theta_rad = theta_degrees * (np.pi / 180)
+
+
+    # Function to calculate y for a given x
+    def calculate_y(x):
+        return (rho - x * np.cos(theta_rad)) / np.sin(theta_rad)
+
+    # Calculate y for a range of x values
+    x_values = [7, 9, 6, 6, 3]  # Choose different x values
+    corresponding_y_values = [calculate_y(x) for x in x_values]
+
+    # Display the approximate data points
+    print("Approximate data points in the xy-plane:")
+    for i, x in enumerate(x_values):
+        y = corresponding_y_values[i]
+        print(f"({x}, {y:.2f})")

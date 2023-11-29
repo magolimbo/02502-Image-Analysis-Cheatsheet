@@ -272,7 +272,7 @@ def blob_analysis_mini_figures():
 
 # E2022
 def abdominal_analysis():
-    in_dir = "data/dicom/"
+    in_dir = "C:/Users/Dell/Desktop/Git Hub/02502-Image-Analysis-Cheatsheet/Exams/dec2022/data/dicom/"
     ct = dicom.read_file(in_dir + '1-162.dcm')
     ground_truth_img = io.imread(in_dir + 'KidneyROI.png')
 
@@ -505,19 +505,19 @@ def lda_classification():
 
 
 if __name__ == '__main__':
-    abdominal_analysis()
+    # abdominal_analysis()
     hough_space()
-    shortest_path_cost()
-    haar_feature()
-    linear_stretch_and_otsus()
-    edge_filtering()
-    lda_classification()
-    cow_sheep_classifier()
-    blob_analysis_mini_figures()
-    pca_on_car_data()
-    landmark_based_registration()
-    gaussian_filtering()
-    rotate_image()
-    car_tracking_rgb_to_hsv_threshold()
-    we_cu_change_detection()
-    system_frame_rate()
+    # shortest_path_cost()
+    # haar_feature()
+    # linear_stretch_and_otsus()
+    # edge_filtering()
+    # lda_classification()
+    # cow_sheep_classifier()
+    # blob_analysis_mini_figures()
+    # pca_on_car_data()
+    # landmark_based_registration()
+    # gaussian_filtering()
+    # rotate_image()
+    # car_tracking_rgb_to_hsv_threshold()
+    # we_cu_change_detection()
+    # system_frame_rate()
