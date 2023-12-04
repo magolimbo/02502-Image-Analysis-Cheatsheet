@@ -7,6 +7,7 @@ import os
 import pathlib
 from skimage.transform import SimilarityTransform
 from skimage.transform import warp
+from skimage.transform import matrix_transform
 import pandas as pd
 
 #show two images side by side
@@ -375,3 +376,40 @@ def var_explained(S, plot=True, show_df=True):
     if show_df:
         print(df_var_exp)
     return df_var_exp
+
+def similarity_transformation(moving_img, fixed_img, src, dst):
+    don1 = moving_img
+    don2 = fixed_img
+
+    e_x = src[:, 0] - dst[:, 0]
+    error_x = np.dot(e_x, e_x)
+    e_y = src[:, 1] - dst[:, 1]
+    error_y = np.dot(e_y, e_y)
+    f = error_x + error_y
+    print(f"Landmark alignment error F (sum of squared differences): {f}")
+
+
+    tform = SimilarityTransform()
+    tform.estimate(src, dst)
+    tform.scale_params = True
+    src_transform = matrix_transform(src, tform.params)
+
+    fig, ax = plt.subplots()
+    io.imshow(don1)
+    ax.plot(
+        src_transform[:, 0],
+        src_transform[:, 1],
+        "-r",
+        markersize=12,
+        label="Source transform",
+    )
+    ax.plot(dst[:, 0], dst[:, 1], "-g", markersize=12, label="Destination")
+    ax.invert_yaxis()
+    ax.legend()
+    ax.set_title("Landmarks after alignment")
+    plt.show()
+
+    warped = warp(don2, tform.inverse)
+    show_comparison(don1, warped, "Landmark based transformation")
+    warped = img_as_ubyte(warped)
+    return warped
