@@ -7,11 +7,11 @@ import os
 import pathlib
 from skimage.transform import SimilarityTransform
 from skimage.transform import warp
+import pandas as pd
 
 #show two images side by side
 def show_comparison(original, transformed, transformed_name = "Transformed Image", cmap = "gray"):
-    _, (ax1, ax2) = plt.subplots(ncols=2, figsize=(8, 4), sharex=True,
-                                   sharey=True)
+    _, (ax1, ax2) = plt.subplots(ncols=2, figsize=(8, 4), sharex=True, sharey=True)
     ax1.imshow(original)
     ax1.set_title('Original')
     ax1.axis('off')
@@ -349,3 +349,29 @@ def linear_gray_scale_transformation(image, min_val, max_val):
     transformed_image = np.clip(transformed_image, min_val, max_val)  # Clip values to desired range
     
     return transformed_image
+
+def var_explained(S, plot=True, show_df=True):
+    """
+    S = list of variances of components (can be read from the S/Sigma matrix)
+    plot = to plot or not
+    show_df = to show df with varaince explained or not
+    """
+    S = np.array(S)
+
+    # df with variance explained
+    df_var_exp = pd.DataFrame(columns=["k", "var_explained"])
+    for i in range(len(S)):
+        t = np.sum(S[0 : i + 1] ** 2) / np.sum(S ** 2)
+        df_var_exp.loc[i] = [i + 1, t]
+    if plot:
+        # plot of variance explained
+        plt.plot(df_var_exp["k"], df_var_exp["var_explained"])
+        plt.scatter(df_var_exp["k"], df_var_exp["var_explained"])
+        plt.title("Variance explained")
+        plt.xlim(np.min(df_var_exp["k"]), np.max(df_var_exp["k"]))
+        plt.ylim(0, 1)
+        plt.show()
+
+    if show_df:
+        print(df_var_exp)
+    return df_var_exp
