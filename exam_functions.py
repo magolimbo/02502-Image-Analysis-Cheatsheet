@@ -9,6 +9,7 @@ from skimage.transform import SimilarityTransform
 from skimage.transform import warp
 from skimage.transform import matrix_transform
 import pandas as pd
+from scipy.stats import norm
 
 #show two images side by side
 def show_comparison(original, transformed, transformed_name = "Transformed Image", cmap = "gray"):
@@ -413,3 +414,80 @@ def similarity_transformation(moving_img, fixed_img, src, dst):
     show_comparison(don1, warped, "Landmark based transformation")
     warped = img_as_ubyte(warped)
     return warped
+
+
+def parametric_distance_classifier(lista):
+    means, stds = [], []
+
+    for el in lista:
+        mu = round(np.mean(el), 3)
+        std = round(np.std(el), 3)
+        means.append(mu)
+        stds.append(std)
+        print(f"{el} - mean = {mu}")
+        print(f"{el} - std  = {std}")
+
+    thresholds = []
+
+    # Calcola la soglia di decisione tra classi adiacenti
+    for i in range(len(means) - 1):
+        mu_low = means[i]
+        std_low = stds[i]
+        mu_high = means[i + 1]
+        std_high = stds[i + 1]
+        thres_low_high = None
+
+        # Calcola la soglia tra le due distribuzioni normali
+        for test_value in np.linspace(mu_low, mu_high, 1000):
+            if norm.pdf(test_value, mu_high, std_high) > norm.pdf(
+                test_value, mu_low, std_low
+            ):
+                thres_low_high = round(test_value, 3)
+                break
+
+        # Memorizza la soglia tra classi adiacenti
+        if thres_low_high is not None:
+            thresholds.append((f"class_{i + 1} and class_{i + 2}", thres_low_high))
+
+    return sorted(thresholds, key=lambda x: x[1])
+
+
+# # Esempio di utilizzo con un numero variabile di classi
+# Grass = [68, 65, 67]
+# Road = [70, 80, 75]
+# Sky = [77, 92, 89]
+# lista = [Grass, Road, Sky]
+
+# result = parametric_distance_classifier(lista)
+# print("\nThresholds between adjacent classes:")
+# for threshold in result:
+#     print(f"{threshold[0]}: {threshold[1]}")
+
+
+def minimum_distance_classifier(lista):
+    means = []
+    for i, el in enumerate(lista):
+        mu = round(np.mean(el), 3)
+        # round((means[idx1] + means[idx2]) / 2, 3)
+        means.append(mu)
+        print(f"{el} - mean = {means[i]}")
+
+    grey_values = {}
+    sorted_indices = sorted(range(len(means)), key=lambda x: means[x])
+
+    # Calcola i punti medi tra due elementi consecutivi
+    for i in range(len(sorted_indices) - 1):
+        idx1 = sorted_indices[i]
+        idx2 = sorted_indices[i + 1]
+        midpoint = round((means[idx1] + means[idx2]) / 2, 3)
+        grey_values[f"({means[idx1]}, {means[idx2]})"] = midpoint
+
+    print(f"\n{grey_values}")
+    return grey_values
+
+# Grass = [68, 65, 67]
+# Road = [70, 80, 75]
+# Sky = [77, 92, 89]
+# lista = [Grass, Road, Sky]
+
+# ciao = minimum_distance_classifier(lista)
