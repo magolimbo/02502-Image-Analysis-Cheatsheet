@@ -10,6 +10,11 @@ from skimage.transform import warp
 from skimage.transform import matrix_transform
 import pandas as pd
 from scipy.stats import norm
+from skimage import color
+from skimage.util import img_as_float, img_as_uint
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+
 
 #show two images side by side
 def show_comparison(original, transformed, transformed_name = "Transformed Image", cmap = "gray"):
@@ -416,10 +421,21 @@ def similarity_transformation(moving_img, fixed_img, src, dst):
     return warped
 
 
-def parametric_distance_classifier(lista):
+def parametric_distance_classifier(data):
+    """
+    Computes thresholds between adjacent classes using parametric classifier.
+
+    Args:
+    - data: List of class data containing numerical values.
+
+    Returns:
+    - List of tuples with thresholds between adjacent classes sorted by threshold values.
+    """
+
     means, stds = [], []
 
-    for el in lista:
+    # Calculate means and standard deviations for each class
+    for el in data:
         mu = round(np.mean(el), 3)
         std = round(np.std(el), 3)
         means.append(mu)
@@ -429,7 +445,7 @@ def parametric_distance_classifier(lista):
 
     thresholds = []
 
-    # Calcola la soglia di decisione tra classi adiacenti
+    # Calculate decision thresholds between adjacent classes
     for i in range(len(means) - 1):
         mu_low = means[i]
         std_low = stds[i]
@@ -437,18 +453,17 @@ def parametric_distance_classifier(lista):
         std_high = stds[i + 1]
         thres_low_high = None
 
-        # Calcola la soglia tra le due distribuzioni normali
+        # Compute the threshold between the two normal distributions
         for test_value in np.linspace(mu_low, mu_high, 1000):
-            if norm.pdf(test_value, mu_high, std_high) > norm.pdf(
-                test_value, mu_low, std_low
-            ):
+            if norm.pdf(test_value, mu_high, std_high) > norm.pdf(test_value, mu_low, std_low):
                 thres_low_high = round(test_value, 3)
                 break
 
-        # Memorizza la soglia tra classi adiacenti
+        # Store the threshold between adjacent classes
         if thres_low_high is not None:
             thresholds.append((f"class_{i + 1} and class_{i + 2}", thres_low_high))
 
+    # Return sorted thresholds between classes
     return sorted(thresholds, key=lambda x: x[1])
 
 
@@ -464,24 +479,35 @@ def parametric_distance_classifier(lista):
 #     print(f"{threshold[0]}: {threshold[1]}")
 
 
-def minimum_distance_classifier(lista):
+def minimum_distance_classifier(data):
+    """
+    Computes midpoints between means of consecutive elements.
+
+    Args:
+    - data: List of numerical elements.
+
+    Returns:
+    - Dictionary containing midpoints between consecutive means.
+    """
     means = []
-    for i, el in enumerate(lista):
+
+    # Calculate means for each element in the list
+    for i, el in enumerate(data):
         mu = round(np.mean(el), 3)
-        # round((means[idx1] + means[idx2]) / 2, 3)
         means.append(mu)
         print(f"{el} - mean = {means[i]}")
 
     grey_values = {}
     sorted_indices = sorted(range(len(means)), key=lambda x: means[x])
 
-    # Calcola i punti medi tra due elementi consecutivi
+    # Calculate midpoints between consecutive means
     for i in range(len(sorted_indices) - 1):
         idx1 = sorted_indices[i]
         idx2 = sorted_indices[i + 1]
         midpoint = round((means[idx1] + means[idx2]) / 2, 3)
         grey_values[f"({means[idx1]}, {means[idx2]})"] = midpoint
 
+    # Print and return dictionary of midpoints
     print(f"\n{grey_values}")
     return grey_values
 
@@ -491,3 +517,83 @@ def minimum_distance_classifier(lista):
 # lista = [Grass, Road, Sky]
 
 # ciao = minimum_distance_classifier(lista)
+
+#stritching
+def histogram_stretch(img_in, min, max):
+    """
+    Stretches the histogram of an image
+    :param img_in: Input image
+    :return: Image, where the histogram is stretched so the min values is 0 and the maximum value 255
+    """
+    # img_as_float will divide all pixel values with 255.0
+    img_float = img_as_float(img_in)
+    min_val = img_float.min()
+    max_val = img_float.max()
+    min_desired = min
+    max_desired = max
+
+    # Do something here
+    img_out = (
+        (img_float - min_val) * (max_desired - min_desired) / (max_val - min_val)
+    ) + min_desired
+    # img_as_ubyte will multiply all pixel values with 255.0 before converting to unsigned byte
+    return img_out
+
+
+
+def lda(class_0_data, class_1_data, new_vector):
+    """
+    Performs Linear Discriminant Analysis (LDA) and predicts probabilities for a new vector.
+
+    Args:
+    - class_0_data: Data for class 0.
+    - class_1_data: Data for class 1.
+    - new_vector: New observation to predict probabilities for.
+
+    Returns:
+    - Predicted probabilities for each class for the new observation.
+    """
+    # Combine the class data and labels
+    class_0_labels = [0] * len(class_0_data)
+    class_1_labels = [1] * len(class_1_data)
+    positions = class_0_data + class_1_data
+    labels = class_0_labels + class_1_labels
+
+    # Create and train the LDA classifier
+    lda = LinearDiscriminantAnalysis()
+    lda.fit(positions, labels)
+
+    # Predict the probabilities for each class for the new observation
+    predicted_probabilities = lda.predict_proba([new_vector])
+
+    return predicted_probabilities[0]
+
+
+
+# # Esempio di utilizzo della funzione lda()
+# # Dati delle classi
+# class_0_positions = [
+#     [1.00, 1.00],
+#     [2.20, -3.00],
+#     [3.50, -1.40],
+#     [3.70, -2.70],
+#     [5.00, 0],
+# ]
+
+# class_1_positions = [
+#     [0.10, 0.70],
+#     [0.22, -2.10],
+#     [0.35, -0.98],
+#     [0.37, -1.89],
+#     [0.50, 0],
+# ]
+
+# # Nuovo vettore
+# new_vector = [1.00, 1.00]
+
+# # Calcola le probabilità che il nuovo vettore appartenga ad entrambe le classi
+# probabilities = lda(class_0_positions, class_1_positions, new_vector)
+# print(f"Probability for class 0 (Mushroom Type A): {probabilities[0]}")
+# print(f"Probability for class 1 (Mushroom Type B): {probabilities[1]}")
+
+
