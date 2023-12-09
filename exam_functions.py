@@ -54,6 +54,17 @@ def read_landmark_file(file_name):
         lm[i, 1] = lm_s[2 + i * 2]
     return lm
 
+def blob_circularity(area, perimeter):
+    """
+    You may get values larger than 1 because
+    we are in a "discrete" (pixels) domain. Check:
+
+    CIRCULARITY OF OBJECTS IN IMAGES, Botterma, M.J. (2000)
+    https://core.ac.uk/download/pdf/14946814.pdf
+    """
+    f_circ = (4 * np.pi * area) / (perimeter**2)
+    return f_circ
+
 
 
 def align_and_crop_one_cat_to_destination_cat(img_src, lm_src, img_dst, lm_dst):
@@ -233,7 +244,7 @@ def create_affine_matrix(transformations):
 
 
 # # Esempio di trasformazioni
-# L'ordine è importante
+# # L'ordine è importante
 # transformations = [
 #     ('rotation', (45, -30, 10)),  # Rotazione (x=pitch, y=roll, z=yaw)
 #     ('translation', (10, 5, 3)),  # Traslazione
@@ -247,8 +258,20 @@ def create_affine_matrix(transformations):
 # print(affine_matrix)
 
 
+def instance_count(array):
+    # Compute the instances
+    if isinstance(array,np.array):
+        valori_unici, conteggi = np.unique(array, return_counts=True)
+    else:
+        valori_unici, conteggi = np.unique(np.array(array), return_counts=True)
 
-def convert_hough_to_xy(x, y):
+    # Print results
+    for valore, conteggio in zip(valori_unici, conteggi):
+        print(f"Valore: {valore}, Numero di istanze: {conteggio}")
+        
+        
+
+def convert_xy_to_hough(x, y):
     """
     Convert xy-coordinates to Hough space parameters (rho and theta).
 
@@ -275,8 +298,9 @@ def convert_hough_to_xy(x, y):
     print("Hough space parameters:")
     print(f"Rho: {rho:.2f}")
     print(f"Theta (degrees): {theta_degrees:.2f}")
+    return rho, theta_degrees
     
-def convert_xy_to_hough(rho, theta_degrees, x_values=[]):
+def convert_hough_to_xy(rho, theta_degrees, x_values=[]):
     """
     Convert Hough space parameters (rho and theta) to Cartesian space (x and y).
 

@@ -99,7 +99,7 @@ def change_detection_F2023():
 
 
 def system_frame_rate_F2023():
-    # bytes per second
+    # bytes per second@
     transfer_speed = 24000000
     image_mb = 1600 * 800 * 3
     images_per_second = transfer_speed / image_mb
@@ -375,15 +375,9 @@ def otsu_rotate_image_F2023():
 
 
 def landmark_based_registration_F2023():
-    in_dir = "data/LMRegistration/"
+    in_dir = r"Exams\may2023\data\LMRegistration/"
     src_img = io.imread(in_dir + 'shoe_1.png')
     dst_img = io.imread(in_dir + 'shoe_2.png')
-
-    # src = np.array([[55, 220], [675, 105], [675, 315]])
-    # dst = np.array([[165, 100], [605, 200], [525, 379]])
-
-    # src = np.array([[320, 40], [120, 425], [330, 740]])
-    # dst = np.array([[320, 80], [155, 380], [300, 670]])
 
     src = np.array([[40, 320], [425, 120], [740, 330]])
     dst = np.array([[80, 320], [380, 155], [670, 300]])
@@ -395,29 +389,26 @@ def landmark_based_registration_F2023():
     f = error_x + error_y
     print(f"Landmark alignment error F: {f}")
 
-    plt.imshow(src_img)
-    plt.plot(src[:, 0], src[:, 1], '.r', markersize=12)
-    plt.title("Source image")
-    plt.show()
-
-    fig, ax = plt.subplots()
-    ax.plot(src[:, 0], src[:, 1], '*r', markersize=12, label="Source")
-    ax.plot(dst[:, 0], dst[:, 1], '*g', markersize=12, label="Destination")
-    ax.invert_yaxis()
-    ax.legend()
-    ax.set_title("Landmarks before alignment")
-    plt.show()
-
-    # plt.scatter(src[:, 0], src[:, 1])
-    # plt.scatter(trg[:, 0], trg[:, 1])
+    # plt.imshow(src_img)
+    # plt.plot(src[:, 0], src[:, 1], '.r', markersize=12)
+    # plt.title("Source image")
     # plt.show()
-    # tform = EuclideanTransform()
+
+    # fig, ax = plt.subplots()
+    # ax.plot(src[:, 0], src[:, 1], '*r', markersize=12, label="Source")
+    # ax.plot(dst[:, 0], dst[:, 1], '*g', markersize=12, label="Destination")
+    # ax.invert_yaxis()
+    # ax.legend()
+    # ax.set_title("Landmarks before alignment")
+    # plt.show()
+
     tform = SimilarityTransform()
     tform.estimate(src, dst)
     print(f"Answer: scale {tform.scale:.2f}")
 
     src_transform = matrix_transform(src, tform.params)
-    # print(src_transform)
+    print(src_transform)
+
 
     e_x = src_transform[:, 0] - dst[:, 0]
     error_x = np.dot(e_x, e_x)
@@ -427,14 +418,14 @@ def landmark_based_registration_F2023():
     print(f"Aligned landmark alignment error F: {f_after}")
     print(f"Answer: alignment error change: {f - f_after:.0f}")
 
-    fig, ax = plt.subplots()
-    ax.plot(src[:, 0], src[:, 1], '*r', markersize=12, label="Source")
-    ax.plot(src_transform[:, 0], src_transform[:, 1], '*b', markersize=12, label="Source transformed")
-    ax.plot(dst[:, 0], dst[:, 1], '*g', markersize=12, label="Destination")
-    ax.invert_yaxis()
-    ax.legend()
-    ax.set_title("Landmarks after alignment")
-    plt.show()
+    # fig, ax = plt.subplots()
+    # ax.plot(src[:, 0], src[:, 1], '*r', markersize=12, label="Source")
+    # ax.plot(src_transform[:, 0], src_transform[:, 1], '*b', markersize=12, label="Source transformed")
+    # ax.plot(dst[:, 0], dst[:, 1], '*g', markersize=12, label="Destination")
+    # ax.invert_yaxis()
+    # ax.legend()
+    # ax.set_title("Landmarks after alignment")
+    # plt.show()
 
     warped = warp(src_img, tform.inverse)
 
@@ -447,18 +438,18 @@ def landmark_based_registration_F2023():
     val_2_b = val_2[2]
     print(f"Answer: b difference {np.abs(val_2_b - val_1_b)}")
 
-    fig, ax = plt.subplots(ncols=3, figsize=(16, 6))
-    ax[0].imshow(src_img)
-    ax[0].plot(src[:, 0], src[:, 1], '.r', markersize=12)
-    # ax[1].plot(dst[:, 0], dst[:, 1], '.r', markersize=12)
-    ax[1].imshow(warped)
-    ax[1].plot(src_transform[:, 0], src_transform[:, 1], '.r', markersize=12)
-    ax[2].imshow(dst_img)
-    ax[2].plot(dst[:, 0], dst[:, 1], '.r', markersize=12)
-    for a in ax:
-        a.axis('off')
-    plt.tight_layout()
-    plt.show()
+    # fig, ax = plt.subplots(ncols=3, figsize=(16, 6))
+    # ax[0].imshow(src_img)
+    # ax[0].plot(src[:, 0], src[:, 1], '.r', markersize=12)
+    # # ax[1].plot(dst[:, 0], dst[:, 1], '.r', markersize=12)
+    # ax[1].imshow(warped)
+    # ax[1].plot(src_transform[:, 0], src_transform[:, 1], '.r', markersize=12)
+    # ax[2].imshow(dst_img)
+    # ax[2].plot(dst[:, 0], dst[:, 1], '.r', markersize=12)
+    # for a in ax:
+    #     a.axis('off')
+    # plt.tight_layout()
+    # plt.show()
 
 def create_u_byte_image_from_vector(im_vec, height, width, channels):
     min_val = im_vec.min()
@@ -1399,11 +1390,11 @@ def lda_classification():
 if __name__ == '__main__':
     # pca_on_glass_data_F2023()
     # change_detection_F2023()
-    # system_frame_rate_F2023()
+    system_frame_rate_F2023()
     # nike_rgb_hsv_thresholds_F2023()
     # filtering_F2023()
     # letters_blob_analysis_F2023()
     # kidney_pixel_analysis_F2023()
-    otsu_rotate_image_F2023()
+    # otsu_rotate_image_F2023()
     # landmark_based_registration_F2023()
     # do_pca_on_all_images_in_directory_F2023()
