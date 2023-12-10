@@ -288,6 +288,7 @@ def convert_xy_to_hough(x, y):
     print(f"Theta (degrees): {theta_degrees:.2f}")
     return rho, theta_degrees
     
+    
 def convert_hough_to_xy(rho, theta_degrees, x_values=[]):
     """
     Convert Hough space parameters (rho and theta) to Cartesian space (x and y).
