@@ -661,4 +661,13 @@ def rgb2hsi(r, g, b):
 # length_of_template = np.sqrt(np.sum(squared_matrix_template))
 
 # NCC = correlation /(length_of_image_patch * length_of_template)
-# NCC
+
+
+
+# count instances true values
+# # Conta le istanze di valori unici
+# valori_unici, conteggi = np.unique(array, return_counts=True)
+
+# # Stampa i risultati
+# for valore, conteggio in zip(valori_unici, conteggi):
+#     print(f"Valore: {valore}, Numero di istanze: {conteggio}")
