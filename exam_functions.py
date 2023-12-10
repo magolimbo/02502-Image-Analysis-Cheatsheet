@@ -622,32 +622,21 @@ def lda(class_0_data, class_1_data, new_vector):
 
 
 
-# input is a tuple of RGB colour values
-# example: RGB2HSI((100, 150, 200))
-
-def rgb2hsi( colour ): 
+def rgb2hsi(r, g, b):
     
-    from math import acos, pi, sqrt
+    import math
     
-    (R, G, B) = colour
-       
-    r = R / ((R + 0.000001) + (G + 0.000001) + (B + 0.000001)) 
-    g = G / ((R + 0.000001) + (G + 0.000001) + (B + 0.000001))
-    b = B / ((R + 0.000001) + (G + 0.000001) + (B + 0.000001))
-   
-    num = 0.5 * ((r - g) + (r - b))
-    den = sqrt((r - g)**2 + (r - b) * (g - b))
-    h = acos(num / (den + 0.0000001))
-    
-    if b <= g:
-        h = h
+    h = 0
+    if g >= b:
+        h = math.acos(
+            0.5 * (r - g + r - b) / math.sqrt((r - g) * (r - g) + (r - b) * (g - b))
+        )
     else:
-        h = 2 * pi - h
-    
-    H = round(h * 180/pi)
-    
-    S = round(100 * (1 - 3 * min(r, g, b) + 0.000001), 1)
-    
-    I = round((R + G + B)/3)
-         
-    return (H, S, I)
+        h = 360 - math.acos(
+            0.5 * (r - g + r - b) / math.sqrt((r - g) * (r - g) + (r - b) * (g - b))
+        )
+
+    s = 1 - 3 * (min(r, g, b) / (r + g + b))
+    i = (r + g + b) / 3
+
+    return np.array([h, s, i])
