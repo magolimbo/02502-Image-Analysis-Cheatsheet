@@ -256,18 +256,6 @@ def create_affine_matrix(transformations):
 # affine_matrix = create_affine_matrix(transformations)
 # # Stampare la matrice risultante
 # print(affine_matrix)
-
-
-def instance_count(array):
-    # Compute the instances
-    if isinstance(array,np.array):
-        valori_unici, conteggi = np.unique(array, return_counts=True)
-    else:
-        valori_unici, conteggi = np.unique(np.array(array), return_counts=True)
-
-    # Print results
-    for valore, conteggio in zip(valori_unici, conteggi):
-        print(f"Valore: {valore}, Numero di istanze: {conteggio}")
         
         
 
@@ -444,6 +432,8 @@ def similarity_transformation(moving_img, fixed_img, src, dst):
     warped = img_as_ubyte(warped)
     return warped
 
+import numpy as np
+from scipy.stats import norm
 
 def parametric_distance_classifier(data):
     """
@@ -456,20 +446,16 @@ def parametric_distance_classifier(data):
     - List of tuples with thresholds between adjacent classes sorted by threshold values.
     """
 
-    means, stds = [], []
+    # Ordina i dati delle classi
+    sorted_data = sorted(data, key=lambda x: np.mean(x))
 
-    # Calculate means and standard deviations for each class
-    for el in data:
-        mu = round(np.mean(el), 3)
-        std = round(np.std(el), 3)
-        means.append(mu)
-        stds.append(std)
-        print(f"{el} - mean = {mu}")
-        print(f"{el} - std  = {std}")
+    # Calcola means e stds per ogni classe
+    means = [np.mean(el) for el in sorted_data]
+    stds = [np.std(el) for el in sorted_data]
 
     thresholds = []
 
-    # Calculate decision thresholds between adjacent classes
+    # Calcola le soglie tra classi adiacenti
     for i in range(len(means) - 1):
         mu_low = means[i]
         std_low = stds[i]
@@ -477,18 +463,19 @@ def parametric_distance_classifier(data):
         std_high = stds[i + 1]
         thres_low_high = None
 
-        # Compute the threshold between the two normal distributions
+        # Calcola la soglia tra le due distribuzioni normali
         for test_value in np.linspace(mu_low, mu_high, 1000):
             if norm.pdf(test_value, mu_high, std_high) > norm.pdf(test_value, mu_low, std_low):
                 thres_low_high = round(test_value, 3)
                 break
 
-        # Store the threshold between adjacent classes
+        # Salva la soglia tra classi adiacenti
         if thres_low_high is not None:
             thresholds.append((f"class_{i + 1} and class_{i + 2}", thres_low_high))
 
-    # Return sorted thresholds between classes
+    # Ritorna le soglie tra classi ordinate
     return sorted(thresholds, key=lambda x: x[1])
+
 
 
 # # Esempio di utilizzo con un numero variabile di classi
