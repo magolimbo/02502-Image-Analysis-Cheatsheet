@@ -316,7 +316,8 @@ def convert_hough_to_xy(rho, theta_degrees, x_values=[]):
     for i, x in enumerate(x_values):
         y = corresponding_y_values[i]
         print(f"({x}, {y:.2f})")
-        
+ 
+       
 def haar_features(grey_box=[], white_box=[]):
     """
     Calculate Haar-like features based on the sums of pixel values in specified boxes.
@@ -348,6 +349,7 @@ def integral_image(integral_value=[]):
     """
     print(f"INTEGRAL IMAGE = {sum(integral_value)}")
 
+
 def linear_gray_scale_transformation(image, min_val, max_val):
     """
     Performs a linear grayscale transformation on the input image
@@ -368,6 +370,7 @@ def linear_gray_scale_transformation(image, min_val, max_val):
     transformed_image = np.clip(transformed_image, min_val, max_val)  # Clip values to desired range
     
     return transformed_image
+
 
 def var_explained(S, plot=True, show_df=True):
     """
@@ -394,6 +397,7 @@ def var_explained(S, plot=True, show_df=True):
     if show_df:
         print(df_var_exp)
     return df_var_exp
+
 
 def similarity_transformation(moving_img, fixed_img, src, dst):
     don1 = moving_img
@@ -434,6 +438,7 @@ def similarity_transformation(moving_img, fixed_img, src, dst):
 
 import numpy as np
 from scipy.stats import norm
+
 
 def parametric_distance_classifier(data):
     """
@@ -627,3 +632,33 @@ def rgb2hsi(r, g, b):
     i = (r + g + b) / 3
 
     return np.array([h, s, i])
+
+
+#Normalized Normalised Cross Correlation
+# import numpy as np
+
+# matrix = np.array([[24,12,42,155, 28],
+#  [169,92,102,60,104],
+#  [143 , 81,  94 ,140,196],
+#  [ 68, 157 ,134 ,135 , 73],
+#  [194, 163, 146 , 37, 121]])
+
+# image_patch = matrix[1:4, 1:4]
+
+# template = np.array([[57,129,245],
+#             [192,178,140],
+#             [65,227,35]])
+
+# scalar_prod = image_patch * template
+# correlation = np.sum(scalar_prod)
+
+# # Utilizzo della list comprehension per ottenere la matrice con ogni punto al quadrato
+# squared_matrix_image_patch = [[element ** 2 for element in row] for row in image_patch]
+# squared_matrix_template = [[element ** 2 for element in row] for row in template]
+
+
+# length_of_image_patch = np.sqrt(np.sum(squared_matrix_image_patch))
+# length_of_template = np.sqrt(np.sum(squared_matrix_template))
+
+# NCC = correlation /(length_of_image_patch * length_of_template)
+# NCC
