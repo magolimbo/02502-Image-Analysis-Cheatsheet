@@ -540,7 +540,7 @@ def histogram_stretch(img_in, min, max):
     """
     Stretches the histogram of an image
     :param img_in: Input image
-    :return: Image, where the histogram is stretched so the min values is 0 and the maximum value 255
+    :return: Image, where the histogram is stretched so the min values is min and the maximum value max
     """
     # img_as_float will divide all pixel values with 255.0
     img_float = img_as_float(img_in)
